@@ -78,7 +78,7 @@ inputs:
     default: 3600
 runs:
   using: 'node12'
-  main: 'dist/index.js'
+  main: '../../../dist/index.js'
 branding:
   icon: 'unlock'
   color: 'gray-dark'
