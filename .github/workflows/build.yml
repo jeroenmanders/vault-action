@@ -110,6 +110,7 @@ jobs:
           secret/data/test secret ;
           secret/data/test secret | NAMED_SECRET ;
           secret/data/nested/test otherSecret ;
+        skipMasks: otherSecret
 
     - name: Test Vault Action (default KV V1)
       uses: ./.github/actions/vault
