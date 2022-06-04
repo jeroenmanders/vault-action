@@ -11,6 +11,7 @@ const vaultUrl = `http://${process.env.VAULT_HOST || 'localhost'}:${process.env.
 
 describe('integration', () => {
     beforeAll(async () => {
+        console.log("Connecting to Vault");
         // Verify Connection
         await got(`${vaultUrl}/v1/secret/config`, {
             headers: {

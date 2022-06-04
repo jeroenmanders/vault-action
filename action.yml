@@ -7,6 +7,9 @@ inputs:
   secrets:
     description: 'A semicolon-separated list of secrets to retrieve. These will automatically be converted to environmental variable keys. See README for more details'
     required: false
+  skipMasks:
+    description: 'Comma separated list with environment variable names that should not be masked'
+    required: false
   namespace:
     description: 'The Vault namespace from which to query secrets. Vault Enterprise only, unset by default'
     required: false

@@ -16,6 +16,11 @@ async function exportSecrets() {
 
     const secretsInput = core.getInput('secrets', { required: false });
     const secretRequests = parseSecretsInput(secretsInput);
+    const skipMasksLine = core.getInput('skipMasks', { required: false });
+    var skipMasks = [];
+    if (skipMasksLine != null) {
+        skipMasks = skipMasksLine.split(",");
+    }
 
     const vaultMethod = (core.getInput('method', { required: false }) || 'token').toLowerCase();
     const authPayload = core.getInput('authPayload', { required: false });
@@ -80,7 +85,12 @@ async function exportSecrets() {
         }
         for (const line of value.replace(/\r/g, '').split('\n')) {
             if (line.length > 0) {
-                command.issue('add-mask', line);
+                if (skipMasks.includes(request.outputVarName)) {
+                    console.log(`Not masking ${request.outputVarName}`)
+                } else {
+                    console.log(`Masking ${request.outputVarName}`)
+                    command.issue('add-mask', line);
+                }
             }
         }
         if (exportEnv) {
