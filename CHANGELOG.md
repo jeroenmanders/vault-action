@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 2.4.2 (June 4th, 2022)
+
+* Move from zeit/ncc vercel/ncc
+
 ## 2.4.1 (April 28th, 2022)
 
 Improvements:

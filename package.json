@@ -55,7 +55,7 @@
         "@actions/core": "^1.6.0",
         "@types/got": "^9.6.11",
         "@types/jest": "^27.4.1",
-        "@zeit/ncc": "^0.22.3",
+        "@vercel/ncc": "^0.34.0",
         "jest": "^26.4.2",
         "jest-when": "^3.5.1",
         "semantic-release": "^17.1.1"

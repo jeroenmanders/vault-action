@@ -67,47 +67,11 @@ jobs:
         VAULT_PORT: 8200
         CI: true
 
-  integrationEnterprise:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v1
-
-    - name: Run docker-compose
-      run: docker-compose up -d vault-enterprise
-      env:
-        VAULT_LICENSE_CI: ${{ secrets.VAULT_LICENSE_CI }}
-
-    - uses: actions/setup-node@v1
-      with:
-        node-version: ''
-
-    - name: Setup NPM Cache
-      uses: actions/cache@v1
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-
-    - name: NPM Install
-      run: npm ci
-
-    - name: NPM Build
-      run: npm run build
-
-    - name: NPM Run test:integration:enterprise
-      run: npm run test:integration:enterprise
-      env:
-        VAULT_HOST: localhost
-        VAULT_PORT: 8200
-        CI: true
-
   e2e:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
 
     - name: Run docker-compose
       run: docker-compose up -d vault
