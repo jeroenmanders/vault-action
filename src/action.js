@@ -79,7 +79,7 @@ async function exportSecrets() {
     const results = await getSecrets(requests, client);
 
     for (const result of results) {
-        const { value, request, cachedResponse } = result;
+        var { value, request, cachedResponse } = result;
         if (cachedResponse) {
             core.debug('ℹ using cached response');
         }
