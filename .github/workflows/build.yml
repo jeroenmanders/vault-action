@@ -135,6 +135,12 @@ jobs:
       env:
         OTHER_SECRET_OUTPUT: ${{ steps.kv-secrets.outputs.otherSecret }}
 
+    - name: Print Vault Action Outputs
+      run: |-
+        echo "otherSecret: ${{ steps.kv-secrets.outputs.otherSecret }}"
+        echo "NAMED_SECRET: ${{ steps.kv-secrets.outputs.NAMED_SECRET }}"
+        echo "secret: ${{ steps.kv-secrets.outputs.secret }}"
+
 # TODO: Fix error in "Setup Vault":
 #   RequestError: unable to verify the first certificate
 #      at ClientRequest.<anonymous> (/home/runner/work/vault-action/vault-action/node_modules/got/dist/source/core/index.js:956:111)
