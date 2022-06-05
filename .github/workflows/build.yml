@@ -112,6 +112,16 @@ jobs:
           secret/data/nested/test otherSecret ;
         skipMasks: otherSecret, NAMED_SECRET, secret
 
+    - name: Test Vault wildcard Action (default KV V1)
+      id: kv-wildcard-secrets
+      uses: ./vault-action/.github/actions/vault
+      with:
+        url: http://localhost:8200
+        token: testtoken
+        secrets: |
+          my-secret/test * ;
+        skipMasks: otherAltSecret,field1
+
     - name: Test Vault Action (default KV V1)
       uses: ./.github/actions/vault
       with:

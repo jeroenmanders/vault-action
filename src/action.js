@@ -172,12 +172,9 @@ function parseSecretsInput(secretsInput) {
         /** @type {any} */
         const selectorAst = jsonata(selectorQuoted).ast();
         const selector = selectorQuoted.replace(new RegExp('"', 'g'), '');
-        console.log(`Using selector "${selector}". Wildard is "${wildcard}"`)
-        if (selector !== wildcard) {
-            console.log("Selector is not the wildcard")
-        }
+        const isEqual = (selector !== wildcard);
         if (selector !== wildcard && (selectorAst.type !== "path" || selectorAst.steps[0].stages) && selectorAst.type !== "string" && !outputVarName) {
-            throw Error(`You must provide a name for the output key when using json selectors. Input: "${secret}"`);
+            throw Error(`You must provide a name for the output key when using json selectors. Input: "${secret}". Selector "${selector}". Wildard is "${wildcard} equal: ${isEqual}`);
         }
 
         let envVarName = outputVarName;
