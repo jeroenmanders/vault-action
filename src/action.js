@@ -19,7 +19,7 @@ function normalizeOutputKey(dataKey, isEnvVar = false) {
     if (isEnvVar) {
         outputKey = outputKey.toUpperCase();
     }
-    core.info(`Output key for dataKey ${dataKey}, isEnvVar ${isEnvVar} gives ${outputKey}`)
+    core.debug(`Output key for dataKey ${dataKey}, isEnvVar ${isEnvVar} gives ${outputKey}`)
     return outputKey;
 }
 module.exports.normalizeOutputKey = normalizeOutputKey;
@@ -107,9 +107,9 @@ async function exportSecrets() {
         for (const line of value.replace(/\r/g, '').split('\n')) {
             if (line.length > 0) {
                 if (skipMasks.includes(request.outputVarName)) {
-                    core.info(`Not masking ${request.outputVarName}`)
+                    core.debug(`Not masking ${request.outputVarName}`)
                 } else {
-                    core.info(`Masking ${request.outputVarName}`)
+                    core.debug(`Masking ${request.outputVarName}`)
                     command.issue('add-mask', line);
                 }
             }
@@ -223,10 +223,3 @@ function parseHeadersInput(inputKey, inputOptions) {
 }
 module.exports.parseHeadersInput = parseHeadersInput;
 
-// module.exports = {
-//     exportSecrets,
-//     parseSecretsInput,
-//     normalizeOutputKey,
-//     parseHeadersInput,
-//     wildcard
-// };
