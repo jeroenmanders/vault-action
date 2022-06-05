@@ -13,11 +13,13 @@ module.exports.wildcard = wildcard;
  * @param {boolean=} isEnvVar
  */
 function normalizeOutputKey(dataKey, isEnvVar = false) {
+
     let outputKey = dataKey
         .replace('.', '__').replace(new RegExp('-', 'g'), '').replace(/[^\p{L}\p{N}_-]/gu, '');
     if (isEnvVar) {
         outputKey = outputKey.toUpperCase();
     }
+    console.log(`Output key for dataKey ${dataKey}, isEnvVar ${isEnvVar} gives ${outputKey}`)
     return outputKey;
 }
 module.exports.normalizeOutputKey = normalizeOutputKey;
