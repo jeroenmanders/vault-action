@@ -87,11 +87,9 @@ async function exportSecrets() {
             if (line.length > 0) {
                 if (skipMasks.includes(request.outputVarName)) {
                     console.log(`Not masking ${request.outputVarName}`)
-                    value = `${value} not masked`
                 } else {
                     console.log(`Masking ${request.outputVarName}`)
-                    // command.issue('add-mask', line);
-                    value = `${value} masked`
+                    command.issue('add-mask', line);
                 }
             }
         }

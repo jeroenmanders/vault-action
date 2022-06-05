@@ -110,26 +110,26 @@ jobs:
           secret/data/test secret ;
           secret/data/test secret | NAMED_SECRET ;
           secret/data/nested/test otherSecret ;
-        skipMasks: otherSecret
+        skipMasks: otherSecret, NAMED_SECRET, secret
 
-    - name: Test Vault Action (default KV V1)
-      uses: ./.github/actions/vault
-      with:
-        url: http://localhost:8200
-        token: testtoken
-        secrets: |
-          my-secret/test altSecret ;
-          my-secret/test altSecret | NAMED_ALTSECRET ;
-          my-secret/nested/test otherAltSecret ;
-
-    - name: Test Vault Action (cubbyhole)
-      uses: ./.github/actions/vault
-      with:
-        url: http://localhost:8200
-        token: testtoken
-        secrets: |
-          /cubbyhole/test foo ;
-          /cubbyhole/test zip | NAMED_CUBBYSECRET ;
+#    - name: Test Vault Action (default KV V1)
+#      uses: ./.github/actions/vault
+#      with:
+#        url: http://localhost:8200
+#        token: testtoken
+#        secrets: |
+#          my-secret/test altSecret ;
+#          my-secret/test altSecret | NAMED_ALTSECRET ;
+#          my-secret/nested/test otherAltSecret ;
+#
+#    - name: Test Vault Action (cubbyhole)
+#      uses: ./.github/actions/vault
+#      with:
+#        url: http://localhost:8200
+#        token: testtoken
+#        secrets: |
+#          /cubbyhole/test foo ;
+#          /cubbyhole/test zip | NAMED_CUBBYSECRET ;
 
     - name: Verify Vault Action Outputs
       run: npm run test:e2e
