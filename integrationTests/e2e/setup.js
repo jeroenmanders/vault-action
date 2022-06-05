@@ -75,6 +75,21 @@ const vaultUrl = `${process.env.VAULT_HOST}:${process.env.VAULT_PORT}`;
                 zip: 'zap',
             },
         });
+
+        await got(`http://${vaultUrl}/v1/secret/data/wildcard`, {
+            method: 'POST',
+            headers: {
+                'X-Vault-Token': 'testtoken',
+            },
+            json: {
+                data: {
+                    field1: 'FIELD1 VALUE',
+                    field2: 'FIELD2 VALUE',
+                },
+            },
+        });
+
+
     } catch (error) {
         console.log(error);
         process.exit(1);

@@ -119,8 +119,8 @@ jobs:
         url: http://localhost:8200
         token: testtoken
         secrets: |
-          my-secret/test * ;
-        skipMasks: otherAltSecret,field1
+          my-secret/wildcard * ;
+        skipMasks: field1
 
     - name: Test Vault Action (default KV V1)
       uses: ./.github/actions/vault
@@ -148,8 +148,8 @@ jobs:
         echo "secret: ${{ steps.kv-secrets.outputs.secret }}"
         
         echo "--- Wildcard secrets: ----"
-        echo "SECRET: ${{ steps.kv-wildcard-secrets.outputs.SECRET }}"
-        echo "OTHERSECRET: ${{ steps.kv-wildcard-secrets.outputs.OTHERSECRET }}"
+        echo "FIELD1: ${{ steps.kv-wildcard-secrets.outputs.FIELD1 }}"
+        echo "FIELD2: ${{ steps.kv-wildcard-secrets.outputs.FIELD2 }}"
 
     - name: Verify Vault Action Outputs
       run: npm run test:e2e
