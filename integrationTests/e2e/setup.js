@@ -76,7 +76,7 @@ const vaultUrl = `${process.env.VAULT_HOST}:${process.env.VAULT_PORT}`;
             },
         });
 
-        await got(`http://${vaultUrl}/v1/secret/data/wildcard`, {
+        await got(`http://${vaultUrl}/v1/my-secret/wildcard`, {
             method: 'POST',
             headers: {
                 'X-Vault-Token': 'testtoken',
