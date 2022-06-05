@@ -141,6 +141,7 @@ jobs:
     - name: Print Vault Action Outputs
       run: |-
         echo "otherSecret: ${{ steps.kv-secrets.outputs.otherSecret }}"
+        echo "env otherSecret: ${{ env.otherSecret }}"
         echo "NAMED_SECRET: ${{ steps.kv-secrets.outputs.NAMED_SECRET }}"
         echo "secret: ${{ steps.kv-secrets.outputs.secret }}"
 

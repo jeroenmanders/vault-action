@@ -88,7 +88,6 @@ async function exportSecrets() {
                 if (skipMasks.includes(request.outputVarName)) {
                     console.log(`Not masking ${request.outputVarName}`)
                 } else {
-                    console.log(`Masking ${request.outputVarName}`)
                     command.issue('add-mask', line);
                 }
             }
