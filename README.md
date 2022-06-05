@@ -1,5 +1,10 @@
 # Vault GitHub Action
 
+> This repository is a fork of [hashicorp/vault-action](https://github.com/hashicorp/vault-action).  
+> The following items were added:
+> * Wildcards: use a '*' instead of the attribute name to export all attributes of the Vault key
+> * skipMasks: specify a comma-separated list of Vault attributes that should not be masked in the GitHub Actions logs 
+
 ---
 
 **Please note**: We take Vault's security and our users' trust very seriously. If you believe you have found a security issue in Vault or this Vault Action, _please responsibly disclose_ by contacting us at [security@hashicorp.com](mailto:security@hashicorp.com).
