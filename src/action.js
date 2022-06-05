@@ -4,6 +4,7 @@ const command = require('@actions/core/lib/command');
 const got = require('got').default;
 const jsonata = require('jsonata');
 const { auth: { retrieveToken }, secrets: { getSecrets } } = require('./index');
+const wildcard = '*';
 
 const AUTH_METHODS = ['approle', 'token', 'github', 'jwt', 'kubernetes'];
 
@@ -152,8 +153,7 @@ function parseSecretsInput(secretsInput) {
         /** @type {any} */
         const selectorAst = jsonata(selectorQuoted).ast();
         const selector = selectorQuoted.replace(new RegExp('"', 'g'), '');
-
-        if ((selectorAst.type !== "path" || selectorAst.steps[0].stages) && selectorAst.type !== "string" && !outputVarName) {
+        if (selector !== wildcard && (selectorAst.type !== "path" || selectorAst.steps[0].stages) && selectorAst.type !== "string" && !outputVarName) {
             throw Error(`You must provide a name for the output key when using json selectors. Input: "${secret}"`);
         }
 
@@ -216,5 +216,6 @@ module.exports = {
     exportSecrets,
     parseSecretsInput,
     normalizeOutputKey,
-    parseHeadersInput
+    parseHeadersInput,
+    wildcard
 };

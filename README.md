@@ -302,6 +302,14 @@ with:
         secret/data/ci/aws secretKey | AWS_SECRET_ACCESS_KEY
 ```
 
+You can specify a wildcard * for the key name to get all keys in the path.  If you provide an output name with the wildcard, the name will be prepended to the key name:
+
+```yaml
+with:
+    secrets: |
+        secret/data/ci/aws * | MYAPP_ ;
+```
+
 ## Other Secret Engines
 
 Vault Action currently supports retrieving secrets from any engine where secrets

@@ -1,5 +1,5 @@
 const jsonata = require("jsonata");
-
+const { normalizeOutputKey, wildcard} = require('./action');
 
 /**
  * @typedef {Object} SecretRequest
@@ -46,21 +46,67 @@ async function getSecrets(secretRequests, client) {
                 throw error
             }
         }
-        if (!selector.match(/.*[\.].*/)) {
-            selector = '"' + selector + '"'
-        }
-        selector = "data." + selector
-        body = JSON.parse(body)
-        if (body.data["data"] != undefined) {
-            selector = "data." + selector
-        }
+        if (selector == wildcard) {
+            body = JSON.parse(body);
+            let keys = body.data;
+            if (body.data["data"] != undefined) {
+                keys = keys.data;
+            }
 
-        const value = selectData(body, selector);
-        results.push({
-            request: secretRequest,
-            value,
-            cachedResponse
-        });
+            for (let key in keys) {
+                let newRequest = Object.assign({},secretRequest);
+                newRequest.selector = key;
+                if (secretRequest.selector === secretRequest.outputVarName) {
+                    newRequest.outputVarName = key;
+                    newRequest.envVarName = key;
+                }
+                else {
+                    newRequest.outputVarName = secretRequest.outputVarName+key;
+                    newRequest.envVarName = secretRequest.envVarName+key;
+                }
+                newRequest.outputVarName = normalizeOutputKey(newRequest.outputVarName);
+                newRequest.envVarName = normalizeOutputKey(newRequest.envVarName,true);
+
+                selector = key;
+
+                //This code (with exception of parsing body again and using newRequest instead of secretRequest) should match the else code for a single key
+                if (!selector.match(/.*[\.].*/)) {
+                    selector = '"' + selector + '"'
+                }
+                selector = "data." + selector
+                //body = JSON.parse(body)
+                if (body.data["data"] != undefined) {
+                    selector = "data." + selector
+                }
+                const value = selectData(body, selector);
+                results.push({
+                    request: newRequest,
+                    value,
+                    cachedResponse
+                });
+
+                //DEBUG
+                //console.log("After", newRequest, value);
+
+                // used cachedResponse for first entry in wildcard list and set to true for the rest
+                cachedResponse = true;
+            }
+        } else {
+            if (!selector.match(/.*[\.].*/)) {
+                selector = '"' + selector + '"'
+            }
+            selector = "data." + selector
+            body = JSON.parse(body)
+            if (body.data["data"] != undefined) {
+                selector = "data." + selector
+            }
+            const value = selectData(body, selector);
+            results.push({
+                request: secretRequest,
+                value,
+                cachedResponse
+            });
+        }
     }
     return results;
 }
