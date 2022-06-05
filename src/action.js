@@ -19,7 +19,7 @@ function normalizeOutputKey(dataKey, isEnvVar = false) {
     if (isEnvVar) {
         outputKey = outputKey.toUpperCase();
     }
-    console.log(`Output key for dataKey ${dataKey}, isEnvVar ${isEnvVar} gives ${outputKey}`)
+    core.info(`Output key for dataKey ${dataKey}, isEnvVar ${isEnvVar} gives ${outputKey}`)
     return outputKey;
 }
 module.exports.normalizeOutputKey = normalizeOutputKey;
@@ -107,8 +107,9 @@ async function exportSecrets() {
         for (const line of value.replace(/\r/g, '').split('\n')) {
             if (line.length > 0) {
                 if (skipMasks.includes(request.outputVarName)) {
-                    console.log(`Not masking ${request.outputVarName}`)
+                    core.info(`Not masking ${request.outputVarName}`)
                 } else {
+                    core.info(`Masking ${request.outputVarName}`)
                     command.issue('add-mask', line);
                 }
             }

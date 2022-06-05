@@ -141,16 +141,20 @@ jobs:
           /cubbyhole/test foo ;
           /cubbyhole/test zip | NAMED_CUBBYSECRET ;
 
-    - name: Verify Vault Action Outputs
-      run: npm run test:e2e
-      env:
-        OTHER_SECRET_OUTPUT: ${{ steps.kv-secrets.outputs.otherSecret }}
-
     - name: Print Vault Action Outputs
       run: |-
         echo "otherSecret: ${{ steps.kv-secrets.outputs.otherSecret }}"
         echo "NAMED_SECRET: ${{ steps.kv-secrets.outputs.NAMED_SECRET }}"
         echo "secret: ${{ steps.kv-secrets.outputs.secret }}"
+        
+        echo "--- Wildcard secrets: ----"
+        echo "SECRET: ${{ steps.kv-wildcard-secrets.outputs.SECRET }}"
+        echo "OTHERSECRET: ${{ steps.kv-wildcard-secrets.outputs.OTHERSECRET }}"
+
+    - name: Verify Vault Action Outputs
+      run: npm run test:e2e
+      env:
+        OTHER_SECRET_OUTPUT: ${{ steps.kv-secrets.outputs.otherSecret }}
 
 # TODO: Fix error in "Setup Vault":
 #   RequestError: unable to verify the first certificate
