@@ -120,7 +120,7 @@ jobs:
         token: testtoken
         secrets: |
           my-secret/wildcard * | pre_;
-        skipMasks: field1
+        skipMasks: pre_field1
 
     - name: Test Vault Action (default KV V1)
       uses: ./
