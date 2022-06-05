@@ -1,5 +1,5 @@
 const jsonata = require("jsonata");
-const { normalizeOutputKey, wildcard} = require('./action');
+const {normalizeOutputKey, wildcard} = require('./action');
 
 /**
  * @typedef {Object} SecretRequest
@@ -15,17 +15,17 @@ const { normalizeOutputKey, wildcard} = require('./action');
  * @property {boolean} cachedResponse
  */
 
- /**
-  * @template TRequest
-  * @param {Array<TRequest>} secretRequests
-  * @param {import('got').Got} client
-  * @return {Promise<SecretResponse<TRequest>[]>}
-  */
+/**
+ * @template TRequest
+ * @param {Array<TRequest>} secretRequests
+ * @param {import('got').Got} client
+ * @return {Promise<SecretResponse<TRequest>[]>}
+ */
 async function getSecrets(secretRequests, client) {
     const responseCache = new Map();
     const results = [];
     for (const secretRequest of secretRequests) {
-        let { path, selector } = secretRequest;
+        let {path, selector} = secretRequest;
 
         const requestPath = `v1/${path}`;
         let body;
@@ -54,18 +54,17 @@ async function getSecrets(secretRequests, client) {
             }
 
             for (let key in keys) {
-                let newRequest = Object.assign({},secretRequest);
+                let newRequest = Object.assign({}, secretRequest);
                 newRequest.selector = key;
                 if (secretRequest.selector === secretRequest.outputVarName) {
                     newRequest.outputVarName = key;
                     newRequest.envVarName = key;
-                }
-                else {
-                    newRequest.outputVarName = secretRequest.outputVarName+key;
-                    newRequest.envVarName = secretRequest.envVarName+key;
+                } else {
+                    newRequest.outputVarName = secretRequest.outputVarName + key;
+                    newRequest.envVarName = secretRequest.envVarName + key;
                 }
                 newRequest.outputVarName = normalizeOutputKey(newRequest.outputVarName);
-                newRequest.envVarName = normalizeOutputKey(newRequest.envVarName,true);
+                newRequest.envVarName = normalizeOutputKey(newRequest.envVarName, true);
 
                 selector = key;
 
@@ -113,8 +112,8 @@ async function getSecrets(secretRequests, client) {
 
 /**
  * Uses a Jsonata selector retrieve a bit of data from the result
- * @param {object} data 
- * @param {string} selector 
+ * @param {object} data
+ * @param {string} selector
  */
 function selectData(data, selector) {
     const ata = jsonata(selector);

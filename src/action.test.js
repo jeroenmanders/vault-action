@@ -197,6 +197,18 @@ describe('exportSecrets', () => {
         expect(core.setOutput).toBeCalledWith('key', '1');
     });
 
+    it('wildcard secret retrieval', async () => {
+        mockInput('test *');
+        mockVaultData({
+            key: 1
+        });
+
+        await exportSecrets();
+
+        expect(core.exportVariable).toBeCalledWith('KEY', '1');
+        expect(core.setOutput).toBeCalledWith('key', '1');
+    });
+
     it('intl secret retrieval', async () => {
         mockInput('测试 测试');
         mockVaultData({
