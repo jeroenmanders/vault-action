@@ -114,7 +114,7 @@ jobs:
 
     - name: Test Vault wildcard Action (default KV V1)
       id: kv-wildcard-secrets
-      uses: ./vault-action/.github/actions/vault
+      uses: ./.github/actions/vault
       with:
         url: http://localhost:8200
         token: testtoken
