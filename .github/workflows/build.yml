@@ -121,6 +121,7 @@ jobs:
           my-secret/test altSecret ;
           my-secret/test altSecret | NAMED_ALTSECRET ;
           my-secret/nested/test otherAltSecret ;
+        skipMasks: altSecret, NAMED_ALTSECRET, otherAltSecret
 
     - name: Test Vault Action (cubbyhole)
       uses: ./.github/actions/vault
@@ -130,6 +131,7 @@ jobs:
         secrets: |
           /cubbyhole/test foo ;
           /cubbyhole/test zip | NAMED_CUBBYSECRET ;
+        skipMasks: foo, NAMED_CUBBYSECRET
 
     - name: Verify Vault Action Outputs
       run: npm run test:e2e
