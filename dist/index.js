@@ -17125,7 +17125,6 @@ module.exports.wildcard = wildcard;
  * @param {boolean=} isEnvVar
  */
 function normalizeOutputKey(dataKey, isEnvVar = false) {
-
     let outputKey = dataKey
         .replace('.', '__').replace(new RegExp('-', 'g'), '').replace(/[^\p{L}\p{N}_-]/gu, '');
     if (isEnvVar) {
@@ -17261,14 +17260,14 @@ function parseSecretsInput(secretsInput) {
     const output = [];
     for (const secret of secrets) {
         let pathSpec = secret;
-        let outputVarName = null;
+        let outputVarNameOrPrefix = null;
 
         const renameSigilIndex = secret.lastIndexOf('|');
         if (renameSigilIndex > -1) {
             pathSpec = secret.substring(0, renameSigilIndex).trim();
-            outputVarName = secret.substring(renameSigilIndex + 1).trim();
+            outputVarNameOrPrefix = secret.substring(renameSigilIndex + 1).trim();
 
-            if (outputVarName.length < 1) {
+            if (outputVarNameOrPrefix.length < 1) {
                 throw Error(`You must provide a value when mapping a secret to a name. Input: "${secret}"`);
             }
         }
@@ -17287,21 +17286,27 @@ function parseSecretsInput(secretsInput) {
         /** @type {any} */
         const selectorAst = jsonata(selectorQuoted).ast();
         const selector = selectorQuoted.replace(new RegExp('"', 'g'), '');
-        const isEqual = (selector !== wildcard);
-        if (selector !== wildcard && (selectorAst.type !== "path" || selectorAst.steps[0].stages) && selectorAst.type !== "string" && !outputVarName) {
-            throw Error(`You must provide a name for the output key when using json selectors. Input: "${secret}". Selector "${selector}". Wildard is "${wildcard} equal: ${isEqual}`);
+        if (selector !== wildcard && (selectorAst.type !== "path" || selectorAst.steps[0].stages) && selectorAst.type !== "string" && !outputVarNameOrPrefix) {
+            throw Error(`You must provide a name for the output key when using json selectors. Input: "${secret}". Selector "${selector}". Wildard is "${wildcard}`);
         }
 
-        let envVarName = outputVarName;
-        if (!outputVarName) {
-            outputVarName = normalizeOutputKey(selector);
-            envVarName = normalizeOutputKey(selector, true);
+        let prefix = ''
+        let envVarName = outputVarNameOrPrefix;
+
+        if (selector === wildcard && outputVarNameOrPrefix) {
+            prefix = outputVarNameOrPrefix;
         }
 
+        if (!outputVarNameOrPrefix || selector === wildcard) {
+            outputVarNameOrPrefix = normalizeOutputKey(`${prefix}${selector}`);
+            envVarName = normalizeOutputKey(`${prefix}${selector}`, true);
+        }
+
+        core.debug(`Path "${path}" with selector "${selector}" gives envVar "${envVarName}" and outputVar "${outputVarNameOrPrefix}"`)
         output.push({
             path,
             envVarName,
-            outputVarName,
+            outputVarName: outputVarNameOrPrefix,
             selector
         });
     }

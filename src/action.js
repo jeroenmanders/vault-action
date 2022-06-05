@@ -186,8 +186,8 @@ function parseSecretsInput(secretsInput) {
         }
 
         if (!outputVarNameOrPrefix || selector === wildcard) {
-            outputVarNameOrPrefix = normalizeOutputKey(`$(prefix}${selector}`);
-            envVarName = normalizeOutputKey(`$(prefix}${selector}`, true);
+            outputVarNameOrPrefix = normalizeOutputKey(`${prefix}${selector}`);
+            envVarName = normalizeOutputKey(`${prefix}${selector}`, true);
         }
 
         core.debug(`Path "${path}" with selector "${selector}" gives envVar "${envVarName}" and outputVar "${outputVarNameOrPrefix}"`)

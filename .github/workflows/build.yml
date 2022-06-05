@@ -119,7 +119,7 @@ jobs:
         url: http://localhost:8200
         token: testtoken
         secrets: |
-          my-secret/wildcard * ;
+          my-secret/wildcard * | pre_;
         skipMasks: field1
 
     - name: Test Vault Action (default KV V1)
@@ -148,8 +148,8 @@ jobs:
         echo "secret: ${{ steps.kv-secrets.outputs.secret }}"
         
         echo "--- Wildcard secrets: ----"
-        echo "FIELD1: ${{ steps.kv-wildcard-secrets.outputs.FIELD1 }}"
-        echo "FIELD2: ${{ steps.kv-wildcard-secrets.outputs.FIELD2 }}"
+        echo "FIELD1: ${{ steps.kv-wildcard-secrets.outputs.PRE_FIELD1 }}"
+        echo "FIELD2: ${{ steps.kv-wildcard-secrets.outputs.PRE_FIELD2 }}"
 
     - name: Verify Vault Action Outputs
       run: npm run test:e2e

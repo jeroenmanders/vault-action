@@ -209,6 +209,18 @@ describe('exportSecrets', () => {
         expect(core.setOutput).toBeCalledWith('key', '1');
     });
 
+    it('wildcard with prefix secret retrieval', async () => {
+        mockInput('test * | pre_');
+        mockVaultData({
+            key: 1
+        });
+
+        await exportSecrets();
+
+        expect(core.exportVariable).toBeCalledWith('PRE_KEY', '1');
+        expect(core.setOutput).toBeCalledWith('pre_key', '1');
+    });
+
     it('intl secret retrieval', async () => {
         mockInput('测试 测试');
         mockVaultData({
