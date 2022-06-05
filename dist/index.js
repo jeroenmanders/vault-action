@@ -17115,6 +17115,25 @@ const core = __nccwpck_require__(2186);
 const command = __nccwpck_require__(7351);
 const got = (__nccwpck_require__(3061)["default"]);
 const jsonata = __nccwpck_require__(4245);
+module.exports = {};
+const wildcard = '*';
+module.exports.wildcard = wildcard;
+
+/**
+ * Replaces any dot chars to __ and removes non-ascii charts
+ * @param {string} dataKey
+ * @param {boolean=} isEnvVar
+ */
+function normalizeOutputKey(dataKey, isEnvVar = false) {
+    let outputKey = dataKey
+        .replace('.', '__').replace(new RegExp('-', 'g'), '').replace(/[^\p{L}\p{N}_-]/gu, '');
+    if (isEnvVar) {
+        outputKey = outputKey.toUpperCase();
+    }
+    return outputKey;
+}
+module.exports.normalizeOutputKey = normalizeOutputKey;
+
 const { auth: { retrieveToken }, secrets: { getSecrets } } = __nccwpck_require__(4351);
 
 const AUTH_METHODS = ['approle', 'token', 'github', 'jwt', 'kubernetes'];
@@ -17128,6 +17147,11 @@ async function exportSecrets() {
 
     const secretsInput = core.getInput('secrets', { required: false });
     const secretRequests = parseSecretsInput(secretsInput);
+    const skipMasksLine = core.getInput('skipMasks', { required: false });
+    var skipMasks = [];
+    if (skipMasksLine != null) {
+        skipMasks = skipMasksLine.split(",");
+    }
 
     const vaultMethod = (core.getInput('method', { required: false }) || 'token').toLowerCase();
     const authPayload = core.getInput('authPayload', { required: false });
@@ -17186,13 +17210,17 @@ async function exportSecrets() {
     const results = await getSecrets(requests, client);
 
     for (const result of results) {
-        const { value, request, cachedResponse } = result;
+        var { value, request, cachedResponse } = result;
         if (cachedResponse) {
             core.debug('ℹ using cached response');
         }
         for (const line of value.replace(/\r/g, '').split('\n')) {
             if (line.length > 0) {
-                command.issue('add-mask', line);
+                if (skipMasks.includes(request.outputVarName)) {
+                    console.log(`Not masking ${request.outputVarName}`)
+                } else {
+                    command.issue('add-mask', line);
+                }
             }
         }
         if (exportEnv) {
@@ -17202,6 +17230,7 @@ async function exportSecrets() {
         core.debug(`✔ ${request.path} => outputs.${request.outputVarName}${exportEnv ? ` | env.${request.envVarName}` : ''}`);
     }
 };
+module.exports.exportSecrets = exportSecrets;
 
 /** @typedef {Object} SecretRequest 
  * @property {string} path
@@ -17255,9 +17284,9 @@ function parseSecretsInput(secretsInput) {
         /** @type {any} */
         const selectorAst = jsonata(selectorQuoted).ast();
         const selector = selectorQuoted.replace(new RegExp('"', 'g'), '');
-
-        if ((selectorAst.type !== "path" || selectorAst.steps[0].stages) && selectorAst.type !== "string" && !outputVarName) {
-            throw Error(`You must provide a name for the output key when using json selectors. Input: "${secret}"`);
+        const isEqual = (selector !== wildcard);
+        if (selector !== wildcard && (selectorAst.type !== "path" || selectorAst.steps[0].stages) && selectorAst.type !== "string" && !outputVarName) {
+            throw Error(`You must provide a name for the output key when using json selectors. Input: "${secret}". Selector "${selector}". Wildard is "${wildcard} equal: ${isEqual}`);
         }
 
         let envVarName = outputVarName;
@@ -17275,20 +17304,7 @@ function parseSecretsInput(secretsInput) {
     }
     return output;
 }
-
-/**
- * Replaces any dot chars to __ and removes non-ascii charts
- * @param {string} dataKey
- * @param {boolean=} isEnvVar
- */
-function normalizeOutputKey(dataKey, isEnvVar = false) {
-    let outputKey = dataKey
-        .replace('.', '__').replace(new RegExp('-', 'g'), '').replace(/[^\p{L}\p{N}_-]/gu, '');
-    if (isEnvVar) {
-        outputKey = outputKey.toUpperCase();
-    }
-    return outputKey;
-}
+module.exports.parseSecretsInput = parseSecretsInput;
 
 /**
  * @param {string} inputKey
@@ -17314,13 +17330,15 @@ function parseHeadersInput(inputKey, inputOptions) {
             return map;
         }, new Map());
 }
+module.exports.parseHeadersInput = parseHeadersInput;
 
-module.exports = {
-    exportSecrets,
-    parseSecretsInput,
-    normalizeOutputKey,
-    parseHeadersInput
-};
+// module.exports = {
+//     exportSecrets,
+//     parseSecretsInput,
+//     normalizeOutputKey,
+//     parseHeadersInput,
+//     wildcard
+// };
 
 
 /***/ }),
@@ -17490,7 +17508,7 @@ module.exports = {
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const jsonata = __nccwpck_require__(4245);
-
+const {normalizeOutputKey, wildcard} = __nccwpck_require__(3348);
 
 /**
  * @typedef {Object} SecretRequest
@@ -17506,17 +17524,17 @@ const jsonata = __nccwpck_require__(4245);
  * @property {boolean} cachedResponse
  */
 
- /**
-  * @template TRequest
-  * @param {Array<TRequest>} secretRequests
-  * @param {import('got').Got} client
-  * @return {Promise<SecretResponse<TRequest>[]>}
-  */
+/**
+ * @template TRequest
+ * @param {Array<TRequest>} secretRequests
+ * @param {import('got').Got} client
+ * @return {Promise<SecretResponse<TRequest>[]>}
+ */
 async function getSecrets(secretRequests, client) {
     const responseCache = new Map();
     const results = [];
     for (const secretRequest of secretRequests) {
-        let { path, selector } = secretRequest;
+        let {path, selector} = secretRequest;
 
         const requestPath = `v1/${path}`;
         let body;
@@ -17537,29 +17555,74 @@ async function getSecrets(secretRequests, client) {
                 throw error
             }
         }
-        if (!selector.match(/.*[\.].*/)) {
-            selector = '"' + selector + '"'
-        }
-        selector = "data." + selector
-        body = JSON.parse(body)
-        if (body.data["data"] != undefined) {
-            selector = "data." + selector
-        }
+        if (selector == wildcard) {
+            body = JSON.parse(body);
+            let keys = body.data;
+            if (body.data["data"] != undefined) {
+                keys = keys.data;
+            }
 
-        const value = selectData(body, selector);
-        results.push({
-            request: secretRequest,
-            value,
-            cachedResponse
-        });
+            for (let key in keys) {
+                let newRequest = Object.assign({}, secretRequest);
+                newRequest.selector = key;
+                if (secretRequest.selector === secretRequest.outputVarName) {
+                    newRequest.outputVarName = key;
+                    newRequest.envVarName = key;
+                } else {
+                    newRequest.outputVarName = secretRequest.outputVarName + key;
+                    newRequest.envVarName = secretRequest.envVarName + key;
+                }
+                newRequest.outputVarName = normalizeOutputKey(newRequest.outputVarName);
+                newRequest.envVarName = normalizeOutputKey(newRequest.envVarName, true);
+
+                selector = key;
+
+                //This code (with exception of parsing body again and using newRequest instead of secretRequest) should match the else code for a single key
+                if (!selector.match(/.*[\.].*/)) {
+                    selector = '"' + selector + '"'
+                }
+                selector = "data." + selector
+                //body = JSON.parse(body)
+                if (body.data["data"] != undefined) {
+                    selector = "data." + selector
+                }
+                const value = selectData(body, selector);
+                results.push({
+                    request: newRequest,
+                    value,
+                    cachedResponse
+                });
+
+                //DEBUG
+                //console.log("After", newRequest, value);
+
+                // used cachedResponse for first entry in wildcard list and set to true for the rest
+                cachedResponse = true;
+            }
+        } else {
+            if (!selector.match(/.*[\.].*/)) {
+                selector = '"' + selector + '"'
+            }
+            selector = "data." + selector
+            body = JSON.parse(body)
+            if (body.data["data"] != undefined) {
+                selector = "data." + selector
+            }
+            const value = selectData(body, selector);
+            results.push({
+                request: secretRequest,
+                value,
+                cachedResponse
+            });
+        }
     }
     return results;
 }
 
 /**
  * Uses a Jsonata selector retrieve a bit of data from the result
- * @param {object} data 
- * @param {string} selector 
+ * @param {object} data
+ * @param {string} selector
  */
 function selectData(data, selector) {
     const ata = jsonata(selector);
