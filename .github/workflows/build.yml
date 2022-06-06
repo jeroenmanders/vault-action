@@ -188,7 +188,7 @@ jobs:
       env:
         VAULT_HOST: localhost
         VAULT_PORT: 8200
-        VAULTCA: ${{ secrets.VAULTCA }}
+        VAULTCA: ${{ secrets.VAULTCAd }}
         VAULT_CLIENT_CERT: ${{ secrets.VAULT_CLIENT_CERT }}
         VAULT_CLIENT_KEY: ${{ secrets.VAULT_CLIENT_KEY }}
 
