@@ -191,7 +191,14 @@ jobs:
         echo "ca length: ${#ca}"
         echo "cert length: ${#cert}"
         echo "key length: ${#key}"
+        echo "$ca" > ca.pem
+        echo "$cert" > cert.pem
+        echo "$key" > key.pem
         openssl version
+        
+        openssl x509 -in ca.pem -text 
+        openssl x509 -in cert.pem -text 
+        openssl x509 -in key.pem -text
     - name: Setup Vault
       run: node ./integrationTests/e2e-tls/setup.js
       env:
