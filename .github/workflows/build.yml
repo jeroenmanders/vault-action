@@ -186,7 +186,11 @@ jobs:
     - name: Check certificate
       run: |-
         ca="${{ secrets.VAULTCA }}"
+        cert="${{ secrets.VAULT_CLIENT_CERT }}"
+        key="${{ secrets.VAULT_CLIENT_KEY }}"
         echo "ca length: ${#ca}"
+        echo "cert length: ${#cert}"
+        echo "key length: ${#key}"
         openssl version
     - name: Setup Vault
       run: node ./integrationTests/e2e-tls/setup.js
