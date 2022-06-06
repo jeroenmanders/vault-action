@@ -196,8 +196,11 @@ jobs:
         echo "$key" > key.pem
         openssl version
         
+        echo -e "\n-----\nca:"        
         openssl x509 -in ca.pem -text 
+        echo -e "\n-----\ncert:"        
         openssl x509 -in cert.pem -text 
+        echo -e "\n-----\nkey:"        
         openssl x509 -in key.pem -text
     - name: Setup Vault
       run: node ./integrationTests/e2e-tls/setup.js
