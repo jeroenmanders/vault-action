@@ -10,14 +10,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
 
-    - uses: actions/setup-node@v1
+    - uses: actions/setup-node@v3.2.0
       with:
         node-version: ''
 
     - name: Setup NPM Cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3.0.3
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -37,17 +37,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3.0.2
 
     - name: Run docker-compose
       run: docker-compose up -d vault
 
-    - uses: actions/setup-node@v1
+    - uses: actions/setup-node@v3.2.0
       with:
         node-version: ''
 
     - name: Setup NPM Cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3.0.3
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -71,17 +71,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v3.0.2
 
     - name: Run docker-compose
       run: docker-compose up -d vault
 
-    - uses: actions/setup-node@v1
+    - uses: actions/setup-node@v3.2.0
       with:
         node-version: ''
 
     - name: Setup NPM Cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3.0.3
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -160,17 +160,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3.0.2
 
     - name: Run docker-compose
       run: docker-compose up -d vault-tls
 
-    - uses: actions/setup-node@v1
+    - uses: actions/setup-node@v3.2.0
       with:
         node-version: ''
 
     - name: Setup NPM Cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3.0.3
       with:
         path: ~/.npm
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -183,12 +183,17 @@ jobs:
     - name: NPM Build
       run: npm run build
 
+    - name: Check certificate
+      run: |-
+        ca="${{ secrets.VAULTCA }}"
+        echo "ca length: ${#ca}"
+        openssl version
     - name: Setup Vault
       run: node ./integrationTests/e2e-tls/setup.js
       env:
         VAULT_HOST: localhost
         VAULT_PORT: 8200
-        VAULTCA: ${{ secrets.VAULTCAd }}
+        VAULTCA: ${{ secrets.VAULTCA }}
         VAULT_CLIENT_CERT: ${{ secrets.VAULT_CLIENT_CERT }}
         VAULT_CLIENT_KEY: ${{ secrets.VAULT_CLIENT_KEY }}
 
@@ -253,12 +258,12 @@ jobs:
 #    runs-on: ubuntu-latest
 #    needs: [build, integration, e2e]
 #    steps:
-#    - uses: actions/checkout@v1
-#    - uses: actions/setup-node@v1
+#    - uses: actions/checkout@v3.0.2
+#    - uses: actions/setup-node@v3.2.0
 #      with:
 #        node-version: ''
 #    - name: setup npm cache
-#      uses: actions/cache@v1
+#      uses: actions/cache@v3.0.3
 #      with:
 #        path: ~/.npm
 #        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
